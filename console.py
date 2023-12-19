@@ -58,20 +58,36 @@ class HBNBCommand(cmd.Cmd):
         """
         print("Sends a signal to quit the program")
 
-    def do_create(self, arguments):
+    def do_create(self, args):
         """
             Implements the create command
         """
-        if not arguments:
+        arg = args.split()
+        if not args:
             print("** class name missing **")
             return
-        tokens = shlex.split(arguments)
-        if tokens[0] not in HBNBCommand.clss.keys():
+        elif arg[0] not in HBNBCommand.classes:
             print("** class doesn't exist **")
-        else:
-            b1 = HBNBCommand.clss[tokens[0]]()
-            b1.save()
-            print(b1.id)
+            return
+
+        new_instance = eval(arg[0])()
+        print(arg[0])
+        arg.pop(0)
+        for item in arg:
+            item = item.split('=')
+            if len(item) != 2:
+                continue
+            key = item[0]
+            value = item[1]
+            value = self.check_value_type(value)
+            if value is None:
+                continue
+            else:
+                setattr(new_instance, key, value)
+        storage.new(new_instance)
+        storage.save()
+        print(new_instance.id)
+
 
     def help_create(self):
         """
