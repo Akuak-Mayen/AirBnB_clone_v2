@@ -11,7 +11,7 @@ from models.review import Review
 from models.state import State
 from models.user import User
 import json
-
+import shlex
 
 clss = dict()
 clss["BaseModel"] = BaseModel
@@ -44,7 +44,17 @@ class FileStorage(object):
         """
             Returns the dictionary __objects
         """
-        return self.__objects
+          dic = {}
+        if cls:
+            dictionary = self.__objects
+            for key in dictionary:
+                partition = key.replace('.', ' ')
+                partition = shlex.split(partition)
+                if (partition[0] == cls.__name__):
+                    dic[key] = self.__objects[key]
+            return (dic)
+        else:
+             return self.__objects
 
     def new(self, obj):
         """
@@ -82,3 +92,15 @@ class FileStorage(object):
                 self.__objects[k] = clss[dt[k]["__class__"]](**dt[k])
         except Exception as e:
             pass
+
+    def delete(self, obj=None):
+        """ delete an existing element
+        """
+        if obj:
+            key = "{}.{}".format(type(obj).__name__, obj.id)
+            del self.__objects[key]
+
+            def close(self):
+        """ calls reload()
+        """
+        self.reload()
